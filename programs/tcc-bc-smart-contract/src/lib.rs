@@ -16,7 +16,7 @@ pub mod tcc_bc_smart_contract {
         Ok(())
     }
 
-    pub fn increment(ctx: Context<Increment>) -> ProgramResult {
+    pub fn increment_usages(ctx: Context<IncrementUsages>) -> ProgramResult {
         let hub = &mut ctx.accounts.hub;
         hub.usages += 1;
         Ok(())
@@ -35,7 +35,7 @@ pub struct Create<'info> {
 }
 
 #[derive(Accounts)]
-pub struct Increment<'info> {
+pub struct IncrementUsages<'info> {
     #[account(mut)]
     pub hub: Account<'info, Hub>,
 }

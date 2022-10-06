@@ -13,10 +13,13 @@ describe("mysolanaapp", () => {
 
   const pubKey = provider.wallet.publicKey;
 
-  it("Creates a counter", async () => {
-    await program.rpc.create({
+  it("Creates a hub", async () => {
+    const totalPorts = 3;
+    const kwhPrice = 471; // cents
+
+    await program.rpc.create(kwhPrice, totalPorts, {
       accounts: {
-        baseAccount: baseAccount.publicKey,
+        hub: baseAccount.publicKey,
         user: pubKey,
         systemProgram: SystemProgram.programId,
       },
@@ -24,26 +27,29 @@ describe("mysolanaapp", () => {
     });
 
     /* Fetch the account and check the value of count */
-    const account = await program.account.baseAccount.fetch(
-      baseAccount.publicKey
-    );
-    console.log("Count 0: ", account.count.toString());
-    assert.ok(account.count.toString() == 0);
+    const account = await program.account.hub.fetch(baseAccount.publicKey);
+
+    console.log("Created Hub: ");
+    console.log(account);
+
+    assert.equal(totalPorts, account.totalPorts);
+    assert.equal(kwhPrice, account.kwhPrice);
+    assert.equal(pubKey.toString(), account.authority.toString());
+    assert.ok(account.usages.toString() == 0);
   });
 
-  it("Increments the counter for the owner", async () => {
-    await program.rpc.increment({
+  it("Use hub", async () => {
+    await program.rpc.incrementUsages({
       accounts: {
-        baseAccount: baseAccount.publicKey,
+        hub: baseAccount.publicKey,
       },
     });
 
-    const account = await program.account.baseAccount.fetch(
-      baseAccount.publicKey
-    );
-    console.log("Count 1: ", account.count.toString());
+    const account = await program.account.hub.fetch(baseAccount.publicKey);
+
+    console.log("Usages 1: ", account.usages.toString());
     console.log("Owner: ", account.authority.toString());
-    assert.ok(account.count.toString() == 1);
+    assert.ok(account.usages.toString() == 1);
     assert.ok(account.authority.toString() == pubKey.toString());
   });
 });
