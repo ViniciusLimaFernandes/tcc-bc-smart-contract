@@ -18,11 +18,11 @@ pub mod tcc_bc_smart_contract {
 
     pub fn use_hub(ctx: Context<UseHub>, usage_time_in_seconds: i32, total_watts: i32) -> ProgramResult {
         let hub = &mut ctx.accounts.hub;
-        let kwh_price = hub.kwh_price;
+        let kwh_price = hub.kwh_price/100;
 
         let total_usage_in_minutes = usage_time_in_seconds/60;
         let total_usage_in_hours = total_usage_in_minutes/60;
-        let total_kwh_usage = total_usage_in_hours * total_watts;
+        let total_kwh_usage = (total_usage_in_hours * total_watts)/1000;
 
         let total_cost = kwh_price * total_kwh_usage;
         
@@ -42,6 +42,8 @@ pub mod tcc_bc_smart_contract {
             ]
         );
 
+        let updated_hub = &mut ctx.accounts.hub;
+        updated_hub.balance += total_cost as u64;
 
         Ok(())
     }

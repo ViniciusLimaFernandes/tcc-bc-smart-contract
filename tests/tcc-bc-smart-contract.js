@@ -13,9 +13,10 @@ describe("mysolanaapp", () => {
 
   const pubKey = provider.wallet.publicKey;
 
+  const kwhPrice = 40; // cents
+
   it("Creates a hub", async () => {
     const totalPorts = 3;
-    const kwhPrice = 471; // cents
 
     await program.rpc.create(kwhPrice, totalPorts, {
       accounts: {
@@ -32,24 +33,29 @@ describe("mysolanaapp", () => {
     console.log("Created Hub: ");
     console.log(account);
 
+    console.log(`KWH PRICE: ${account.kwhPrice.toString()} cents`);
     assert.equal(totalPorts, account.totalPorts);
-    assert.equal(kwhPrice, account.kwhPrice);
-    assert.equal(pubKey.toString(), account.authority.toString());
+    assert.equal(kwhPrice.toString(), account.kwhPrice.toString());
+    assert.equal(pubKey.toString(), account.owner.toString());
     assert.ok(account.usages.toString() == 0);
+    assert.ok(account.balance.toString() == 0);
   });
 
   it("Use hub", async () => {
-    await program.rpc.incrementUsages({
+    await program.rpc.useHub(3600, 7500, {
       accounts: {
         hub: baseAccount.publicKey,
+        user: pubKey,
+        systemProgram: SystemProgram.programId,
       },
     });
 
     const account = await program.account.hub.fetch(baseAccount.publicKey);
 
     console.log("Usages 1: ", account.usages.toString());
-    console.log("Owner: ", account.authority.toString());
+    console.log("Owner: ", account.owner.toString());
     assert.ok(account.usages.toString() == 1);
-    assert.ok(account.authority.toString() == pubKey.toString());
+    assert.ok(account.owner.toString() == pubKey.toString());
+    console.log(account.balance);
   });
 });
