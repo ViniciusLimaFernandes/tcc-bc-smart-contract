@@ -56,6 +56,20 @@ describe("mysolanaapp", () => {
     console.log("Owner: ", account.owner.toString());
     assert.ok(account.usages.toString() == 1);
     assert.ok(account.owner.toString() == pubKey.toString());
-    console.log(account.balance);
+    assert.ok(account.balance > 0);
+    console.log(account.balance.toString());
+  });
+
+  it("Withdraw from hub", async () => {
+    await program.rpc.withdraw({
+      accounts: {
+        hub: baseAccount.publicKey,
+        user: pubKey,
+      },
+    });
+
+    const account = await program.account.hub.fetch(baseAccount.publicKey);
+
+    console.log("Balance after withdraw: ", account.balance.toString());
   });
 });
