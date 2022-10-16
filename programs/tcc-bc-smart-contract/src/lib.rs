@@ -16,22 +16,13 @@ pub mod tcc_bc_smart_contract {
         Ok(())
     }
 
-    pub fn use_hub(ctx: Context<UseHub>, usage_time_in_seconds: i32, total_watts: i32) -> ProgramResult {
+    pub fn use_hub(ctx: Context<UseHub>, total_to_be_paid: u64) -> ProgramResult {
         let hub = &mut ctx.accounts.hub;
-        let kwh_price = hub.kwh_price;
-
-        let total_usage_in_minutes = usage_time_in_seconds/60;
-        let total_usage_in_hours = total_usage_in_minutes/60;
-        let total_kwh_usage = total_usage_in_hours * total_watts;
-
-        let total_cost = (kwh_price * total_kwh_usage)/100000;
-        
-        hub.usages += 1;
 
         let ix = anchor_lang::solana_program::system_instruction::transfer(
             &ctx.accounts.user.key(),
             &ctx.accounts.hub.key(),
-            total_cost.try_into().unwrap()
+            total_to_be_paid.try_into().unwrap()
         );
 
         anchor_lang::solana_program::program::invoke(
@@ -43,7 +34,8 @@ pub mod tcc_bc_smart_contract {
         );
 
         let updated_hub = &mut ctx.accounts.hub;
-        updated_hub.balance += total_cost as u64;
+        updated_hub.balance += total_to_be_paid;
+        updated_hub.usages += 1;
 
         Ok(())
     }
@@ -63,6 +55,9 @@ pub mod tcc_bc_smart_contract {
 
         **hub.to_account_info().try_borrow_mut_lamports()? -= balance;
         **user.to_account_info().try_borrow_mut_lamports()? += balance;
+
+        let updated_hub = &mut ctx.accounts.hub;
+        updated_hub.balance = 0;
         Ok(())
     }
 }

@@ -42,13 +42,16 @@ describe("mysolanaapp", () => {
   });
 
   it("Use hub", async () => {
-    await program.rpc.useHub(3600, 7500, {
-      accounts: {
-        hub: baseAccount.publicKey,
-        user: pubKey,
-        systemProgram: SystemProgram.programId,
-      },
-    });
+    await program.rpc.useHub(
+      new anchor.BN(0.75 * anchor.web3.LAMPORTS_PER_SOL),
+      {
+        accounts: {
+          hub: baseAccount.publicKey,
+          user: pubKey,
+          systemProgram: SystemProgram.programId,
+        },
+      }
+    );
 
     const account = await program.account.hub.fetch(baseAccount.publicKey);
 
@@ -57,7 +60,7 @@ describe("mysolanaapp", () => {
     assert.ok(account.usages.toString() == 1);
     assert.ok(account.owner.toString() == pubKey.toString());
     assert.ok(account.balance > 0);
-    console.log(account.balance.toString());
+    console.log(`Total balance: ${account.balance.toString()}`);
   });
 
   it("Withdraw from hub", async () => {
