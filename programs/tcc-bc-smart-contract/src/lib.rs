@@ -1,14 +1,15 @@
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::entrypoint::ProgramResult;
 
-declare_id!("5ohR2uLsJrTTPWnxJa27pRSdWxfyiWmwmMvLZQV42fbR");
+declare_id!("DeTH78f8BzftzAUY6kmo7grWPh1ESN1NZP9mSTBnUVyp");
 
 #[program]
 pub mod tcc_bc_smart_contract {
     use super::*;
 
-    pub fn create(ctx: Context<Create>, kwh_price: i32, total_ports: i8) -> ProgramResult {
+    pub fn create(ctx: Context<Create>, kwh_price: i32, total_ports: i8, name: String) -> ProgramResult {
         let hub = &mut ctx.accounts.hub;
+        hub.name = name;
         hub.usages = 0;
         hub.owner = *ctx.accounts.user.key;
         hub.kwh_price = kwh_price;
@@ -95,6 +96,7 @@ pub struct Withdraw<'info> {
 
 #[account]
 pub struct Hub {
+    pub name: String,
     pub usages: u64,
     pub owner: Pubkey,
     pub kwh_price: i32,

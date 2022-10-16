@@ -2,7 +2,7 @@
 seeds = false
 skip-lint = false
 [programs.devnet]
-tcc_bc_smart_contract = "5ohR2uLsJrTTPWnxJa27pRSdWxfyiWmwmMvLZQV42fbR"
+tcc_bc_smart_contract = "DeTH78f8BzftzAUY6kmo7grWPh1ESN1NZP9mSTBnUVyp"
 
 [registry]
 url = "https://api.apr.dev"

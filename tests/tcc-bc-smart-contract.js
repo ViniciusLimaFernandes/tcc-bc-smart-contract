@@ -15,10 +15,12 @@ describe("mysolanaapp", () => {
 
   const kwhPrice = 40; // cents
 
+  const hubName = "A01-Test";
+
   it("Creates a hub", async () => {
     const totalPorts = 3;
 
-    await program.rpc.create(kwhPrice, totalPorts, {
+    await program.rpc.create(kwhPrice, totalPorts, hubName, {
       accounts: {
         hub: baseAccount.publicKey,
         user: pubKey,
@@ -34,11 +36,13 @@ describe("mysolanaapp", () => {
     console.log(account);
 
     console.log(`KWH PRICE: ${account.kwhPrice.toString()} cents`);
+    console.log(`HUB NAME: ${account.name.toString()}`);
     assert.equal(totalPorts, account.totalPorts);
     assert.equal(kwhPrice.toString(), account.kwhPrice.toString());
     assert.equal(pubKey.toString(), account.owner.toString());
     assert.ok(account.usages.toString() == 0);
     assert.ok(account.balance.toString() == 0);
+    assert.ok(account.name.toString() == hubName)
   });
 
   it("Use hub", async () => {
