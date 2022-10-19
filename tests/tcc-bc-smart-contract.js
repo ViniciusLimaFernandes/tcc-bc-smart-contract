@@ -1,6 +1,5 @@
-import * as anchor from '@project-serum/anchor';
-import { Program, utils } from '@project-serum/anchor';
-import assert from 'assert';
+const anchor = require("@project-serum/anchor");
+const assert = require("assert");
 const { SystemProgram } = anchor.web3;
 
 describe("mysolanaapp", () => {
@@ -18,7 +17,13 @@ describe("mysolanaapp", () => {
 
   const hubName = "A01-Test";
 
-  const [hubAccount] = utils.publicKey.findProgramAddressSync([utils.bytes.utf8.encode("tcc_bc_smart_contract"), provider.wallet.publicKey.toBuffer()], program.programId);
+  const [hubAccount] = anchor.utils.publicKey.findProgramAddressSync(
+    [
+      anchor.utils.bytes.utf8.encode("tcc_bc_smart_contract"),
+      provider.wallet.publicKey.toBuffer(),
+    ],
+    program.programId
+  );
 
   it("Creates a hub", async () => {
     const totalPorts = 3;
@@ -31,15 +36,6 @@ describe("mysolanaapp", () => {
         systemProgram: anchor.web3.SystemProgram.programId,
       })
       .rpc();
-
-    // await program.rpc.create(kwhPrice, totalPorts, hubName, {
-    //   accounts: {
-    //     hub: baseAccount.publicKey,
-    //     user: pubKey,
-    //     systemProgram: SystemProgram.programId,
-    //   },
-    //   signers: [baseAccount],
-    // });
 
     /* Fetch the account and check the value of count */
     const account = await program.account.hub.fetch(hubAccount);
@@ -54,41 +50,40 @@ describe("mysolanaapp", () => {
     assert.equal(pubKey.toString(), account.owner.toString());
     assert.ok(account.usages.toString() == 0);
     assert.ok(account.balance.toString() == 0);
-    assert.ok(account.name.toString() == hubName)
+    assert.ok(account.name.toString() == hubName);
   });
 
-  // it("Use hub", async () => {
-  //   await program.rpc.useHub(
-  //     new anchor.BN(0.75 * anchor.web3.LAMPORTS_PER_SOL),
-  //     {
-  //       accounts: {
-  //         hub: baseAccount.publicKey,
-  //         user: pubKey,
-  //         systemProgram: SystemProgram.programId,
-  //       },
-  //     }
-  //   );
+  it("Use hub", async () => {
+    await program.methods
+      .useHub(new anchor.BN(0.75 * anchor.web3.LAMPORTS_PER_SOL))
+      .accounts({
+        hub: hubAccount,
+        user: pubKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
 
-  //   const account = await program.account.hub.fetch(baseAccount.publicKey);
+    const account = await program.account.hub.fetch(hubAccount);
 
-  //   console.log("Usages 1: ", account.usages.toString());
-  //   console.log("Owner: ", account.owner.toString());
-  //   assert.ok(account.usages.toString() == 1);
-  //   assert.ok(account.owner.toString() == pubKey.toString());
-  //   assert.ok(account.balance > 0);
-  //   console.log(`Total balance: ${account.balance.toString()}`);
-  // });
+    console.log("Usages 1: ", account.usages.toString());
+    console.log("Owner: ", account.owner.toString());
+    assert.ok(account.usages.toString() == 1);
+    assert.ok(account.owner.toString() == pubKey.toString());
+    assert.ok(account.balance > 0);
+    console.log(`Total balance: ${account.balance.toString()}`);
+  });
 
-  // it("Withdraw from hub", async () => {
-  //   await program.rpc.withdraw({
-  //     accounts: {
-  //       hub: baseAccount.publicKey,
-  //       user: pubKey,
-  //     },
-  //   });
+  it("Withdraw from hub", async () => {
+    await program.methods
+      .withdraw()
+      .accounts({
+        hub: hubAccount,
+        user: pubKey,
+      })
+      .rpc();
 
-  //   const account = await program.account.hub.fetch(baseAccount.publicKey);
+    const account = await program.account.hub.fetch(hubAccount);
 
-  //   console.log("Balance after withdraw: ", account.balance.toString());
-  // });
+    console.log("Balance after withdraw: ", account.balance.toString());
+  });
 });
