@@ -17,13 +17,7 @@ describe("mysolanaapp", () => {
 
   const hubName = "A01-Test";
 
-  const [hubAccount] = anchor.utils.publicKey.findProgramAddressSync(
-    [
-      anchor.utils.bytes.utf8.encode("tcc_bc_smart_contract"),
-      provider.wallet.publicKey.toBuffer(),
-    ],
-    program.programId
-  );
+  const hubAccount = anchor.web3.Keypair.generate();
 
   it("Creates a hub", async () => {
     const totalPorts = 3;
@@ -31,14 +25,15 @@ describe("mysolanaapp", () => {
     await program.methods
       .create(kwhPrice, totalPorts, hubName)
       .accounts({
-        hub: hubAccount,
+        hub: hubAccount.publicKey,
         user: pubKey,
         systemProgram: anchor.web3.SystemProgram.programId,
       })
+      .signers([hubAccount])
       .rpc();
 
     /* Fetch the account and check the value of count */
-    const account = await program.account.hub.fetch(hubAccount);
+    const account = await program.account.hub.fetch(hubAccount.publicKey);
 
     console.log("Created Hub: ");
     console.log(account);
@@ -57,13 +52,13 @@ describe("mysolanaapp", () => {
     await program.methods
       .useHub(new anchor.BN(0.75 * anchor.web3.LAMPORTS_PER_SOL))
       .accounts({
-        hub: hubAccount,
+        hub: hubAccount.publicKey,
         user: pubKey,
         systemProgram: anchor.web3.SystemProgram.programId,
       })
       .rpc();
 
-    const account = await program.account.hub.fetch(hubAccount);
+    const account = await program.account.hub.fetch(hubAccount.publicKey);
 
     console.log("Usages 1: ", account.usages.toString());
     console.log("Owner: ", account.owner.toString());
@@ -77,12 +72,12 @@ describe("mysolanaapp", () => {
     await program.methods
       .withdraw()
       .accounts({
-        hub: hubAccount,
+        hub: hubAccount.publicKey,
         user: pubKey,
       })
       .rpc();
 
-    const account = await program.account.hub.fetch(hubAccount);
+    const account = await program.account.hub.fetch(hubAccount.publicKey);
 
     console.log("Balance after withdraw: ", account.balance.toString());
   });
