@@ -1,14 +1,14 @@
 [features]
 seeds = false
 skip-lint = false
-[programs.devnet]
+[programs.localnet]
 tcc_bc_smart_contract = "DeTH78f8BzftzAUY6kmo7grWPh1ESN1NZP9mSTBnUVyp"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "devnet"
+cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]

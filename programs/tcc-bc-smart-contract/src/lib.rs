@@ -65,7 +65,7 @@ pub mod tcc_bc_smart_contract {
 
 #[derive(Accounts)]
 pub struct Create<'info> {
-    #[account(init, payer = user, space = 512)]
+    #[account(init, payer = user, space = 512, seeds=[b"tcc_bc_smart_contract".as_ref(), user.key().as_ref()], bump)]
     pub hub: Account<'info, Hub>,
 
     #[account(mut)]
