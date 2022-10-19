@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::entrypoint::ProgramResult;
 
-declare_id!("DeTH78f8BzftzAUY6kmo7grWPh1ESN1NZP9mSTBnUVyp");
+declare_id!("J3LDdEnt1MYXLEFtn4TMH6pWaJN16ZTrijHHgUcUNY9M");
 
 #[program]
 pub mod tcc_bc_smart_contract {
